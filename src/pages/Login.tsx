@@ -2,15 +2,23 @@ import React, { useState } from "react";
 import CInput from "@/components/core/CInput";
 import CButton from "@/components/core/CButton";
 import Input from "@/components/ui/Input";
+import { authService } from "@/api/authService";
+import APIResponse from "@/classes/APIResponse";
+import { useNavigate } from "react-router-dom";
 
 const Login: React.FC = () => {
+    const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Handle login logic here
-        console.log("Email:", email, "Password:", password);
+        authService.login(email, password).then(response => {
+            console.log(response);
+            if (response.code === APIResponse.SUCCESS) {
+                navigate("/");
+            }
+        });
     };
 
     return (

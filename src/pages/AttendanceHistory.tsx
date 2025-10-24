@@ -1,9 +1,12 @@
 import SSelect from "@/components/core/CSelect";
 import AttendanceEntry from "@/components/feature/AttendanceEntry";
 import type { Option } from "@/types/component";
-import React, { useState } from "react";
+import { useState, type FC } from "react";
+import type { BasicPageProps } from "@/types/component";
 
-const AttendanceHistory: React.FC = () => {
+interface AttendanceHistoryProps extends BasicPageProps { }
+
+const AttendanceHistory: FC<AttendanceHistoryProps> = ({ title, description }) => {
     const [filter, setFilter] = useState<Option>({ key: "month", label: "This Month", value: "month" });
 
     const filterOptions: Option[] = [
@@ -22,10 +25,11 @@ const AttendanceHistory: React.FC = () => {
     ];
 
     return (
-        <div className="min-h-screen flex flex-col items-center bg-[#0E1425] px-4 py-8">
+        <div className="min-h-screen flex flex-col items-center px-4 pt-2">
             <div className="w-full max-w-md">
                 {/* Filter Dropdown */}
-                <div className="flex justify-end mb-6">
+                <div className="flex justify-between mb-6">
+                    <h1 className="font-semibold">{title}</h1>
                     <SSelect
                         options={filterOptions}
                         value={filter}
@@ -52,3 +56,4 @@ const AttendanceHistory: React.FC = () => {
 };
 
 export default AttendanceHistory;
+

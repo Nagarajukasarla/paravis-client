@@ -1,11 +1,23 @@
-import AttendanceHistory from "@/pages/AttendanceHistory";
-import Login from "@/pages/Login";
-import MarkAttendance from "@/pages/MarkAttendance";
 import React from "react";
+import { Outlet } from "react-router-dom";
+import Header from "./Header";
+import Footer from "./Footer";
 
 const AppLayout: React.FC = () => {
     return (
-        <AttendanceHistory />
+        <>
+            <div className="w-full h-screen flex flex-col">
+                <div className="flex flex-col">
+                    <Header className="h-16 px-2 z-50 sticky top-0" />
+                    <div className="flex-1 overflow-y-auto">
+                        <Outlet />
+                    </div>
+
+                    {/* Footer */}
+                    <Footer className="sticky bottom-0"/>
+                </div>
+            </div>
+        </>
     );
 };
 

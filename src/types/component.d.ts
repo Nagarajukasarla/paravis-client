@@ -20,3 +20,11 @@ export type Option = {
     object?: any;
 }
 
+export type BasicContainerProps = {
+    className?: string;
+}
+
+interface BasicPageProps {
+    title: string;
+    description?: string;
+}
