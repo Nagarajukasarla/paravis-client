@@ -9,12 +9,12 @@ const AppLayout: React.FC = () => {
             <div className="w-full h-screen flex flex-col">
                 <div className="flex flex-col">
                     <Header className="h-16 px-2 z-50 sticky top-0" />
-                    <div className="flex-1 overflow-y-auto">
+                    <div className="flex-1 overflow-y-auto pb-14">
                         <Outlet />
                     </div>
 
                     {/* Footer */}
-                    <Footer className="sticky bottom-0"/>
+                    <Footer className="bottom-0"/>
                 </div>
             </div>
         </>

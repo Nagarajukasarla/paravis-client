@@ -1,7 +1,7 @@
 /**
  * Option for select component
  */
-export type Option = {
+type Option = {
     /**
      * Key of the option
      */
@@ -20,7 +20,7 @@ export type Option = {
     object?: any;
 }
 
-export type BasicContainerProps = {
+type BasicContainerProps = {
     className?: string;
 }
 

@@ -1,28 +1,88 @@
 import SSelect from "@/components/core/CSelect";
 import AttendanceEntry from "@/components/feature/AttendanceEntry";
-import type { Option } from "@/types/component";
-import { useState, type FC } from "react";
-import type { BasicPageProps } from "@/types/component";
+import { useState, useMemo, useEffect, type FC } from "react";
+import { formatLocalDate, getAttendances } from "@/utils/dateUtils";
+import Spinner from "@/components/feature/Spinner";
 
 interface AttendanceHistoryProps extends BasicPageProps { }
 
-const AttendanceHistory: FC<AttendanceHistoryProps> = ({ title, description }) => {
+const AttendanceHistory: FC<AttendanceHistoryProps> = ({ title }) => {
     const [filter, setFilter] = useState<Option>({ key: "month", label: "This Month", value: "month" });
+    const [loading, setLoading] = useState<boolean>(true);
 
     const filterOptions: Option[] = [
         { key: "week", label: "This Week", value: "week" },
         { key: "month", label: "This Month", value: "month" },
         { key: "prevMonth", label: "Previous Month", value: "prevMonth" },
-
     ];
 
-    const attendanceData = [
-        { index: 1, inTime: "09:02 AM", outTime: "05:00 PM", isActive: true },
-        { index: 2, inTime: "08:09 AM", outTime: "06:00 PM" },
-        { index: 3, inTime: "08:59 AM", outTime: "06:00 PM" },
-        { index: 4, inTime: "09:01 AM", outTime: "06:00 PM" },
-        { index: 5, inTime: "09:01 AM", outTime: "--- ---" },
-    ];
+    // Calculate date range based on filter
+    const { from, to } = useMemo(() => {
+        const now = new Date();
+        let fromDate: Date;
+        let toDate: Date;
+
+        switch (filter.value) {
+            case "week": {
+                const dayOfWeek = now.getDay();
+                fromDate = new Date(now);
+                fromDate.setDate(now.getDate() - dayOfWeek);
+                toDate = new Date(fromDate);
+                toDate.setDate(fromDate.getDate() + 6);
+                break;
+            }
+            case "prevMonth": {
+                fromDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                toDate = new Date(now.getFullYear(), now.getMonth(), 0);
+                break;
+            }
+            case "month": {
+                fromDate = new Date(now.getFullYear(), now.getMonth(), 1);
+                toDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                break;
+            }
+            default: {
+                fromDate = new Date(now.getFullYear(), now.getMonth(), 1);
+                toDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            }
+        }
+
+        return {
+            from: formatLocalDate(fromDate),
+            to: formatLocalDate(toDate),
+        };
+    }, [filter]);
+
+    // Get days for the selected period and attendance data
+    const periodDays = useMemo(() => {
+        const fromDate = new Date(from);
+        const toDate = new Date(to);
+        const days: { date: string; day: number }[] = [];
+
+        for (let d = new Date(fromDate); d <= toDate; d.setDate(d.getDate() + 1)) {
+            days.push({
+                date: d.toISOString().split("T")[0],
+                day: d.getDate(),
+            });
+        }
+
+        return days;
+    }, [from, to]);
+
+    const attendances = useMemo(() => getAttendances(from, to), [from, to]);
+
+    useEffect(() => {
+        // Simulate brief loading for data processing
+        const timer = setTimeout(() => setLoading(false), 100);
+        return () => clearTimeout(timer);
+    }, []);
+
+    console.log("attendances: ", attendances);
+    console.log("periodDays: ", periodDays);
+
+    if (loading) {
+        return <Spinner />;
+    }
 
     return (
         <div className="min-h-screen flex flex-col items-center px-4 pt-2">
@@ -40,15 +100,22 @@ const AttendanceHistory: FC<AttendanceHistoryProps> = ({ title, description }) =
 
                 {/* Attendance Records */}
                 <div className="space-y-3">
-                    {attendanceData.map((record) => (
-                        <AttendanceEntry
-                            key={record.index}
-                            index={record.index}
-                            inTime={record.inTime}
-                            outTime={record.outTime}
-                            isActive={record.isActive}
-                        />
-                    ))}
+                    {periodDays.map(record => {
+                        const item = attendances.find(a => a.date === record.date);
+                        const isMarked = item ? item.marked : false;
+                        const inTime = item?.inTime || "--- ---";
+                        const outTime = item?.outTime || "--- ---";
+
+                        return (
+                            <AttendanceEntry
+                                key={record.date}
+                                index={record.day}
+                                inTime={inTime}
+                                outTime={outTime}
+                                isMarked={isMarked}
+                            />
+                        );
+                    })}
                 </div>
             </div>
         </div>
@@ -56,4 +123,3 @@ const AttendanceHistory: FC<AttendanceHistoryProps> = ({ title, description }) =
 };
 
 export default AttendanceHistory;
-

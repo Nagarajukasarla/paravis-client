@@ -1,6 +1,8 @@
 export const API_ROUTES = {
     AUTH: "/auth", 
     LOGIN: "/login",
-    MARK_ATTENDANCE: "/mark-attendance",
-    ATTENDANCE_HISTORY: "/attendance-history"
+    MARK_ATTENDANCE: "/mark",
+    ATTENDANCE_HISTORY: "/history",
+    USER: "/user",
+    PARTIAL_USER: "/partial-user"
 };
