@@ -17,12 +17,8 @@ class AuthService extends BaseService {
      * @param password The user's password.
      * @returns A promise that resolves to an `APIResponse` containing a `LiteShop` object.
      */
-    async login(email: string, password: string): Promise<APIResponse<any>> {
-        // return this.post<any>(API_ROUTES.LOGIN, { email, password });
-        console.log("Login attempt with: ", email, password);
-        // Temporarly set user in local storage
-        localStorage.setItem("user", JSON.stringify({ email, password }));
-        return new APIResponse<any>(APIResponse.SUCCESS, "Login successful");
+    async login(emailOrId: string, password: string): Promise<APIResponse<any>> {
+        return this.post<any>(API_ROUTES.LOGIN, { emailOrId, password });
     }
 
     async logout(): Promise<APIResponse<any>> {

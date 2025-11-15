@@ -224,6 +224,7 @@ import { formatLocalDate } from "@/utils/dateUtils";
 import { getUser } from "@/utils/user";
 import React, { useState, useEffect } from "react";
 import Spinner from "@/components/feature/Spinner";
+import Cookies from "js-cookie";
 
 const MarkAttendance: React.FC = () => {
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
@@ -248,6 +249,7 @@ const MarkAttendance: React.FC = () => {
     };
 
     useEffect(() => {
+        console.log(Cookies.get("user"));
         return () => {
             if (capturedImage) URL.revokeObjectURL(capturedImage);
         };
