@@ -25,6 +25,10 @@ class AuthService extends BaseService {
         return new APIResponse<any>(APIResponse.SUCCESS, "Login successful");
     }
 
+    async logout(): Promise<APIResponse<any>> {
+        localStorage.removeItem("user");
+        return new APIResponse<any>(APIResponse.SUCCESS, "Logout successful");
+    }
 }
 
 export const authService = new AuthService();
