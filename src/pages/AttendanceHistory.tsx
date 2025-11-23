@@ -1,8 +1,11 @@
 import SSelect from "@/components/core/CSelect";
 import AttendanceEntry from "@/components/feature/AttendanceEntry";
-import { useState, useMemo, useEffect, type FC } from "react";
-import { formatLocalDate, getAttendances } from "@/utils/dateUtils";
 import Spinner from "@/components/feature/Spinner";
+import { usePreferencesData } from "@/hooks/usePreferencesData";
+import { useUserData } from "@/hooks/useUserData";
+import type { BasicPageProps, DaySpecification, Option } from "@/types/component";
+import { formatLocalDate } from "@/utils/dateUtils";
+import { useEffect, useMemo, useState, type FC } from "react";
 
 interface AttendanceHistoryProps extends BasicPageProps { }
 
@@ -69,7 +72,6 @@ const AttendanceHistory: FC<AttendanceHistoryProps> = ({ title }) => {
         return days;
     }, [from, to]);
 
-    const attendances = useMemo(() => getAttendances(from, to), [from, to]);
 
     useEffect(() => {
         // Simulate brief loading for data processing
@@ -77,10 +79,54 @@ const AttendanceHistory: FC<AttendanceHistoryProps> = ({ title }) => {
         return () => clearTimeout(timer);
     }, []);
 
-    console.log("attendances: ", attendances);
-    console.log("periodDays: ", periodDays);
+    const { user, loading: loadingUser } = useUserData();
+    const { preferences } = usePreferencesData();
+
+    const getDaySpecification = (date: string): DaySpecification => {
+        const getDayName = new Date(date).toLocaleDateString("en", { weekday: "long" });
+        console.log("getDayName: ", getDayName);
+
+        if (preferences?.weekends.find((val: string) => val === getDayName)) {
+            return { type: "weekend", date: date, description: "Weekend" };
+        }
+
+        const holiday:any = preferences?.holidays.find((holiday: any) => {
+            // holiday object format : {2025-11-22: "Holiday description"}
+            if (Object.keys(holiday)[0] === date) {
+                return holiday;
+            }
+        });
+
+        if (holiday) {
+            return { type: "holiday", date: date, description: holiday[date] };
+        }
+
+        const attendance:any = user?.attended.find((attendance: any) => {
+            const attendanceDate = attendance.inTime?.split("T")[0];
+            return attendanceDate === date;
+        });
+
+        if (attendance) {
+            return { type: "attended", date: date, description: "Attended", inTime: attendance.inTime, outTime: attendance.outTime };
+        }
+
+        const leave = user?.leaves.find((leave: any) => {
+            const leaveDate = leave.date;
+            return leaveDate === date;
+        });
+
+        if (leave) {
+            return { type: "leave", date: date, description: "Leave" };
+        }
+
+        return { type: "unattended", date: date, description: "Unattended" };
+    };
 
     if (loading) {
+        return <Spinner />;
+    }
+
+    if (loadingUser) {
         return <Spinner />;
     }
 
@@ -101,18 +147,19 @@ const AttendanceHistory: FC<AttendanceHistoryProps> = ({ title }) => {
                 {/* Attendance Records */}
                 <div className="space-y-3">
                     {periodDays.map(record => {
-                        const item = attendances.find(a => a.date === record.date);
-                        const isMarked = item ? item.marked : false;
-                        const inTime = item?.inTime || "--- ---";
-                        const outTime = item?.outTime || "--- ---";
-
+                        const daySpecification = getDaySpecification(record.date);
+                        const inTime = daySpecification?.inTime ? new Date(daySpecification.inTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "--- ---";
+                        const outTime = daySpecification?.outTime ? new Date(daySpecification.outTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "--- ---";
+                        const recordColor = daySpecification?.type === "attended" ? "blue"
+                            : daySpecification?.type === "unattended" ? "gray"
+                                : "red"
                         return (
                             <AttendanceEntry
                                 key={record.date}
                                 index={record.day}
                                 inTime={inTime}
                                 outTime={outTime}
-                                isMarked={isMarked}
+                                markColor={recordColor} // blue | red | gray
                             />
                         );
                     })}

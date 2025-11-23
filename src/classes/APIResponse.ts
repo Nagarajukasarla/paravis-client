@@ -5,11 +5,15 @@ class APIResponse<T = any> {
     public description: string;
 
     static readonly NETWORK_ERROR = -1;
+    static readonly NO_INTERNET = -2;
+    static readonly SERVER_DOWN = -3;
 
     static readonly SUCCESS = 200;
     static readonly CREATED = 201;
     static readonly PARTIAL_CONTENT = 206;
 
+    static readonly UNAUTHORIZED = 401;
+    static readonly FORBIDDEN = 403;
     static readonly NOT_FOUND = 404;
     static readonly REQUEST_TIMEOUT = 408;
     static readonly CONFLICT = 409;
@@ -35,8 +39,20 @@ class APIResponse<T = any> {
             case APIResponse.INTERNAL_SERVER_ERROR:
                 this.setInternalServerErrorResponse();
                 break;
+            case APIResponse.NO_INTERNET:
+                this.setNoInternetError();
+                break;
+            case APIResponse.SERVER_DOWN:
+                this.setServerDownError();
+                break;
             case APIResponse.NETWORK_ERROR:
                 this.setNetworkError();
+                break;
+            case APIResponse.UNAUTHORIZED:
+                this.setUnauthorizedError();
+                break;
+            case APIResponse.FORBIDDEN:
+                this.setForbiddenError();
                 break;
             default:
                 this.setUnknownErrorResponse();
@@ -67,16 +83,44 @@ class APIResponse<T = any> {
         this.data = null;
     }
 
+    /**
+     * @deprecated
+     * Sets the response for a network error.
+     */
     private setNetworkError(): void {
         this.type = "Network Error";
         this.code = -1;
         this.description = "Network error or request was blocked. Please check your internet connection.";
     }
 
+    private setNoInternetError(): void {
+        this.type = "No Internet";
+        this.code = -2;
+        this.description = "No internet connection. Please check your internet connection.";
+    }
+
+    private setServerDownError(): void {
+        this.type = "Server Down";
+        this.code = -3;
+        this.description = "Server is down. Please try again later.";
+    }
+
     private setUnknownErrorResponse(): void {
         this.type = "Unknown";
         this.description = "Unknown error occurred";
         this.data = null;
+    }
+
+    private setUnauthorizedError(): void {
+        this.type = "Unauthorized";
+        this.code = 401;
+        this.description = "Unauthorized";
+    }
+
+    private setForbiddenError(): void {
+        this.type = "Forbidden";
+        this.code = 403;
+        this.description = "Forbidden";
     }
 
     private getTypeFromCode(code: number): string {
@@ -93,8 +137,16 @@ class APIResponse<T = any> {
                 return "Conflict";
             case APIResponse.INTERNAL_SERVER_ERROR:
                 return "Internal Server Error";
+            case APIResponse.NO_INTERNET:
+                return "No Internet";
+            case APIResponse.SERVER_DOWN:
+                return "Server Down";
             case APIResponse.NETWORK_ERROR:
                 return "Network Error";
+            case APIResponse.UNAUTHORIZED:
+                return "Unauthorized";
+            case APIResponse.FORBIDDEN:
+                return "Forbidden";
             default:
                 return "Unknown";
         }
@@ -112,8 +164,16 @@ class APIResponse<T = any> {
                 return "Request timeout";
             case APIResponse.CONFLICT:
                 return "Conflict";
+            case APIResponse.NO_INTERNET:
+                return "No internet connection. Please check your internet connection.";
+            case APIResponse.SERVER_DOWN:
+                return "Server is down. Please try again later.";
             case APIResponse.NETWORK_ERROR:
                 return "Network error";
+            case APIResponse.UNAUTHORIZED:
+                return "Unauthorized";
+            case APIResponse.FORBIDDEN:
+                return "Forbidden";
             default:
                 return "An unknown error occurred";
         }

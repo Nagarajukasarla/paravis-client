@@ -1,7 +1,7 @@
 /**
  * Option for select component
  */
-type Option = {
+export type Option = {
     /**
      * Key of the option
      */
@@ -20,11 +20,19 @@ type Option = {
     object?: any;
 }
 
-type BasicContainerProps = {
+export type BasicContainerProps = {
     className?: string;
 }
 
-interface BasicPageProps {
+export interface BasicPageProps {
     title: string;
+    description?: string;
+}
+
+export interface DaySpecification {
+    type: "holiday" | "weekend" | "attended" | "leave" | "unattended";
+    date: string;
+    inTime?: string;
+    outTime?: string;
     description?: string;
 }

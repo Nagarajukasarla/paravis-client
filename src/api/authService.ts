@@ -8,7 +8,7 @@ class AuthService extends BaseService {
      * @returns A promise that resolves to an `APIResponse` containing a string.
      */
     async authenticate(): Promise<APIResponse<string>> {
-        return this.get<string>(API_ROUTES.AUTH);
+        return this.get<string>(API_ROUTES.AUTH_EMPLOYEE);
     }
 
     /**

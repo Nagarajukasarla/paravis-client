@@ -1,23 +1,20 @@
-import React from "react";
+import Spinner from "@/components/feature/Spinner";
 import { Navigate, useLocation } from "react-router-dom";
-import Cookies from "js-cookie";
+import useAuth from "@/hooks/useAuth";
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+    const { isAuthorized, loading } = useAuth();
     const location = useLocation();
 
-    // Check if user exists in cookies
-    const userStr = Cookies.get("user");
-    console.log("===userStr: ", userStr);
-    const user = userStr ? JSON.parse(userStr) : null;
+    if (loading) {
+        return <Spinner />;
+    }
 
-    // Check authentication - verify user data exists
-    const isAuthenticated = Boolean(user && (user.email || user.id));
-
-    if (!isAuthenticated) {
+    if (!isAuthorized) {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 

@@ -27,10 +27,20 @@ class BaseService {
         return new APIResponse<T>(response.status, response.data);
     }
 
-    private handleError<T>(error: unknown): APIResponse<T> {
+    private handleError<T>(error: any): APIResponse<T> {
         const axiosError = error as AxiosError;
-        console.log(axiosError);
-        return new APIResponse<T>(axiosError.response?.status || -1, null);
+        console.log("Error: ", axiosError);
+        console.log("Error response: ", axiosError.response);
+
+        if (error.code === -2 || error.code === -3) {
+            return new APIResponse<T>(error.code, null);
+        }
+
+        if (error.response) {
+            return new APIResponse<T>(error.response.status, error.response.data);
+        }
+
+        return new APIResponse<T>(APIResponse.NETWORK_ERROR, null);
     }
 }
 

@@ -1,25 +1,38 @@
 import React from "react";
 
+export type MarkColor = "blue" | "red" | "gray";
+
 interface AttendanceEntryProps {
     index: number;
     inTime: string;
     outTime: string;
-    isMarked?: boolean;
+    markColor?: MarkColor;
 }
 
-const AttendanceEntry: React.FC<AttendanceEntryProps> = ({ index, inTime, outTime, isMarked = false }) => {
-    const timeColor = outTime === "--- ---" ? "text-gray-400" : "text-red-500";
+const AttendanceEntry: React.FC<AttendanceEntryProps> = ({ index, inTime, outTime, markColor = "gray" }) => {
+    // const timeColor = outTime === "--- ---" ? "text-gray-400" : "text-red-500";
+
+    const entryColor = {
+        "blue": "ring-1 ring-blue-500 bg-blue-50",
+        "red": "ring-1 ring-red-500 bg-red-50",
+        "gray": "ring-1 ring-gray-500 bg-gray-50"
+    }[markColor];
+
+    const markColorClass = {
+        "blue": "bg-blue-600",
+        "red": "bg-red-600",
+        "gray": "bg-gray-400"
+    }[markColor];
 
     return (
         <div
             className={`flex items-center justify-between bg-white rounded-xl px-4 py-3 mb-3 shadow-sm border
-                ${isMarked ? "ring-1 ring-blue-500 bg-blue-50" : ""}
-            `}
+                ${entryColor}`}
         >
             {/* Index Circle */}
             <div
                 className={`w-8 h-8 flex items-center justify-center rounded-full font-semibold text-white text-sm
-                    ${isMarked ? "bg-blue-600" : "bg-gray-400"}
+                    ${markColorClass}
                 `}
             >
                 {index}
@@ -32,7 +45,7 @@ const AttendanceEntry: React.FC<AttendanceEntryProps> = ({ index, inTime, outTim
                         IN: <span className="text-blue-600">{inTime}</span>
                     </p>
                     <p className="text-gray-800 font-medium">
-                        OUT: <span className={timeColor}>{outTime}</span>
+                        OUT: <span className="text-blue-600">{outTime}</span>
                     </p>
                 </div>
             </div>

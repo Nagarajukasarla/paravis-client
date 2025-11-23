@@ -8,8 +8,7 @@ class Attendance extends BaseService {
      * @returns A promise that resolves to an `APIResponse` containing a string.
      */
     async mark(payload: FormData): Promise<APIResponse<string>> {
-        // return this.post<any>(API_ROUTES.MARK_ATTENDANCE, payload);
-        return new APIResponse<string>(200, "Attendance marked successfully!");
+        return this.post<any>(API_ROUTES.MARK_ATTENDANCE, payload);
     }
 }
 
