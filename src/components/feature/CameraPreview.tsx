@@ -324,13 +324,14 @@ import { motion, AnimatePresence } from "framer-motion";
 interface CameraPreviewProps {
     capturedImage: string | null; // object URL or null
     onCapture: (previewUrl: string, file: File) => void;
-    isMarked: boolean;
+    isMarkedInTime: boolean;
+    isMarkedOutTime: boolean
 }
-
 const CameraPreview: React.FC<CameraPreviewProps> = ({
     capturedImage,
     onCapture,
-    isMarked,
+    isMarkedInTime,
+    isMarkedOutTime,
 }) => {
     const videoRef = useRef<HTMLVideoElement | null>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -378,7 +379,7 @@ const CameraPreview: React.FC<CameraPreviewProps> = ({
             }
         };
 
-        if (!isMarked && !capturedImage && !activeStreamRef.current) {
+        if (!isMarkedInTime && !isMarkedOutTime && !capturedImage && !activeStreamRef.current) {
             startCamera();
         } else {
             stopActiveStream();
@@ -396,7 +397,7 @@ const CameraPreview: React.FC<CameraPreviewProps> = ({
             document.removeEventListener("visibilitychange", handleVisibilityChange);
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [capturedImage, isMarked]);
+    }, [capturedImage, isMarkedInTime, isMarkedOutTime]);
 
     // take picture -> convert to blob -> create File and preview URL
     const takePicture = async () => {
@@ -460,7 +461,7 @@ const CameraPreview: React.FC<CameraPreviewProps> = ({
                 </div>
             ) : (
                 <AnimatePresence mode="wait">
-                    {isMarked ? (
+                    {(isMarkedInTime || isMarkedOutTime) ? (
                         <motion.div
                             key="marked"
                             initial={{ opacity: 0 }}
@@ -468,7 +469,7 @@ const CameraPreview: React.FC<CameraPreviewProps> = ({
                             exit={{ opacity: 0 }}
                             className="flex flex-col items-center justify-center h-64 bg-green-100 text-green-700 font-semibold"
                         >
-                            ✅ Already Marked
+                            {`✅ Already Marked ${isMarkedOutTime ? 'Out' : 'In'} Time`}
                         </motion.div>
                     ) : capturedImage ? (
                         <motion.img
@@ -497,24 +498,17 @@ const CameraPreview: React.FC<CameraPreviewProps> = ({
                 </AnimatePresence>
             )}
 
-            {isCameraStarting && !error && !capturedImage && !isMarked && (
+            {isCameraStarting && !error && !capturedImage && !isMarkedInTime && !isMarkedOutTime && (
                 <div className="absolute inset-0 bg-black/60 text-white flex items-center justify-center text-sm">
                     Starting camera...
                 </div>
             )}
 
-            {!error && !capturedImage && !isMarked && !isCameraStarting && (
+            {!error && !capturedImage && !isMarkedInTime && !isMarkedOutTime && !isCameraStarting && (
                 <>
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <div className="w-40 h-40 border-4 border-orange-400 rounded-full flex items-center justify-center">
-                            <div className="w-10 h-10 border-t-4 border-orange-400 rounded-full animate-spin" />
-                        </div>
+                        <div className="w-10 h-10 border-t-4 border-orange-400 rounded-full animate-spin" />
                     </div>
-
-                    <p className="absolute top-4 left-1/2 transform -translate-x-1/2 text-white text-sm font-medium bg-black/50 px-3 py-1 rounded-full">
-                        Align face within the circle
-                    </p>
-
                     <button
                         onClick={takePicture}
                         className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-orange-500 text-white font-semibold py-2 px-6 rounded-full shadow-lg hover:bg-orange-600 transition"
@@ -529,5 +523,5 @@ const CameraPreview: React.FC<CameraPreviewProps> = ({
     );
 };
 
-// 🚀 Memoized to prevent re-renders from parent
+// Memoized to prevent re-renders from parent
 export default React.memo(CameraPreview);

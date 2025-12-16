@@ -1,6 +1,7 @@
 import APIResponse from "@/classes/APIResponse";
 import BaseService from "@/api/baseService";
 import { API_ROUTES } from "@/constants/apiRoutes";
+import type { AppResponse } from "@/types/api";
 
 class AuthService extends BaseService {
     /**
@@ -17,8 +18,8 @@ class AuthService extends BaseService {
      * @param password The user's password.
      * @returns A promise that resolves to an `APIResponse` containing a `LiteShop` object.
      */
-    async login(emailOrId: string, password: string): Promise<APIResponse<any>> {
-        return this.post<any>(API_ROUTES.LOGIN, { emailOrId, password });
+    async login(emailOrId: string, password: string): Promise<APIResponse<AppResponse<any>>> {
+        return this.post<AppResponse<any>>(API_ROUTES.LOGIN, { emailOrId, password });
     }
 
     async logout(): Promise<APIResponse<any>> {

@@ -1,7 +1,7 @@
 import BaseService from "./baseService";
 import { API_ROUTES } from "../constants/apiRoutes";
 import APIResponse from "../classes/APIResponse";
-import type { AppResponse, Preferences, User } from "@/types/api";
+import type { AppResponse, Leave, Preferences, User } from "@/types/api";
 
 class UserService extends BaseService {
     /**
@@ -23,6 +23,10 @@ class UserService extends BaseService {
 
     async getPreferences(): Promise<APIResponse<AppResponse<Preferences>>> {
         return this.get<AppResponse<Preferences>>(API_ROUTES.PREFERENCES);
+    }
+
+    async applyLeave(payload: Leave): Promise<APIResponse<AppResponse<string>>> {
+        return this.post<AppResponse<string>>(API_ROUTES.APPLY_LEAVE, payload);
     }
 }
 

@@ -12,6 +12,7 @@ class APIResponse<T = any> {
     static readonly CREATED = 201;
     static readonly PARTIAL_CONTENT = 206;
 
+    static readonly BAD_REQUEST = 400;
     static readonly UNAUTHORIZED = 401;
     static readonly FORBIDDEN = 403;
     static readonly NOT_FOUND = 404;
@@ -29,6 +30,9 @@ class APIResponse<T = any> {
             case APIResponse.SUCCESS:
             case APIResponse.CREATED:
                 this.setSuccessResponse();
+                break;
+            case APIResponse.BAD_REQUEST:
+                this.setBadRequest();
                 break;
             case APIResponse.NOT_FOUND:
                 this.setNotFoundResponse();
@@ -60,10 +64,14 @@ class APIResponse<T = any> {
         }
     }
 
+    private setBadRequest(): void {
+        this.type = "Bad Request";
+        this.description = "Request was unsuccessful";
+    }
+
     private setNotFoundResponse(): void {
         this.type = "Not Found";
         this.description = "The endpoint you're requesting is not available";
-        this.data = null;
     }
 
     private setSuccessResponse(): void {
@@ -74,7 +82,6 @@ class APIResponse<T = any> {
     private setConflictResponse(): void {
         this.type = "Conflict";
         this.description = "The request could not be completed due to a conflict";
-        this.data = null;
     }
 
     private setInternalServerErrorResponse(): void {
@@ -108,7 +115,6 @@ class APIResponse<T = any> {
     private setUnknownErrorResponse(): void {
         this.type = "Unknown";
         this.description = "Unknown error occurred";
-        this.data = null;
     }
 
     private setUnauthorizedError(): void {
@@ -129,6 +135,8 @@ class APIResponse<T = any> {
                 return "Success";
             case APIResponse.CREATED:
                 return "Created";
+            case APIResponse.BAD_REQUEST:
+                return "Bad Request";
             case APIResponse.NOT_FOUND:
                 return "Not Found";
             case APIResponse.REQUEST_TIMEOUT:
@@ -156,6 +164,8 @@ class APIResponse<T = any> {
         switch (code) {
             case APIResponse.SUCCESS:
                 return "Request successful";
+            case APIResponse.BAD_REQUEST:
+                return "Request was unsuccessful";
             case APIResponse.NOT_FOUND:
                 return "Resource not found";
             case APIResponse.INTERNAL_SERVER_ERROR:

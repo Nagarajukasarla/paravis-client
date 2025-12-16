@@ -15,6 +15,7 @@ export function useUserData() {
             const response = await userService.getProfile();
             if (response.code === APIResponse.SUCCESS) {
                 const data = response.data?.data;
+                console.log("==> data: ", data);
                 appState.patch({
                     user: {
                         empId: data?.empId ?? "",

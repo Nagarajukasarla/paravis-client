@@ -1,15 +1,14 @@
 
-import { useUserData } from "../hooks/useUserData";
 import Spinner from "@/components/feature/Spinner";
 import type { BasicPageProps } from "@/types/component";
 import { LogOut, UserX } from "lucide-react";
-import type { FC } from "react";
+import { type FC } from "react";
+import { useUserData } from "../hooks/useUserData";
 
 interface ProfileProps extends BasicPageProps { }
 
 const Profile: FC<ProfileProps> = () => {
     const { user, loading } = useUserData();
-
     const onLogout = () => console.log("Logging out...");
     const onResign = () => console.log("Resign request sent");
 
@@ -29,13 +28,13 @@ const Profile: FC<ProfileProps> = () => {
                         className="w-24 h-24 rounded-full border-4 border-white shadow-md object-cover"
                     />
                     <h2 className="text-2xl font-bold mt-3">{user?.name}</h2>
-                    <p className="text-sm opacity-80">Employee ID: {user?.empId}</p>
+                    <p className="text-sm font-bold">{user?.empId}</p>
                 </div>
 
                 {/* Shift Details */}
                 <div className="px-6 py-4 border-b">
                     <h3 className="font-semibold text-gray-700 mb-1">Shift Timing</h3>
-                    <p className="text-blue-700 font-medium">{user?.shiftTimings?.start} - {user?.shiftTimings?.end}</p>
+                    <p className="text-blue-700 font-medium">{user?.shiftTimings?.start.split("+")[0]} - {user?.shiftTimings?.end.split("+")[0]}</p>
                 </div>
 
                 {/* Attendance Stats */}
@@ -55,18 +54,27 @@ const Profile: FC<ProfileProps> = () => {
                 </div>
 
                 {/* Buttons */}
-                <div className="flex flex-col px-6 mt-2">
+                <div className="flex justify-between px-6 mt-4">
                     <button
                         onClick={onLogout}
-                        className="flex items-center justify-center mb-2 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl shadow-sm transition"
+                        className="flex items-center justify-center 
+                                    bg-primary hover:bg-primary-hover 
+                                    text-white py-2 px-4 rounded-xl 
+                                    shadow-sm transition
+
+                                "
                     >
-                        <LogOut size={18} className="mr-5" /> Logout
+                        <LogOut size={18} className="mr-2" /> Logout
                     </button>
                     <button
                         onClick={onResign}
-                        className="flex items-center justify-center bg-red-600 hover:bg-red-700 text-white py-2 rounded-xl shadow-sm transition"
+                        className="flex items-center justify-center
+                                    bg-red-600 hover:bg-red-700 
+                                    text-white py-2 px-4 rounded-xl 
+                                    shadow-sm transition
+                                "
                     >
-                        <UserX size={18} className="mr-5" /> Resign
+                        <UserX size={18} className="mr-2" /> Resign
                     </button>
                 </div>
             </div>

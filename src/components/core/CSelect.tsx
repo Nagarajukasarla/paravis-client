@@ -35,7 +35,7 @@ const SSelect: React.FC<CSelectProps> = ({ options, value, placeholder, onValueC
                 onValueChange(val);
             }}
         >
-            <SelectTrigger className="w-[150px] sm:w-[200px]">
+            <SelectTrigger className="w-[fit-content] ">
                 <SelectValue placeholder={placeholder} />
             </SelectTrigger>
             <SelectContent>

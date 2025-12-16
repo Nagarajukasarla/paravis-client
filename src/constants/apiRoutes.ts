@@ -6,5 +6,6 @@ export const API_ROUTES = {
     ATTENDANCE_HISTORY: "/employee/history",
     
     PROFILE: "/employee/profile",
-    PREFERENCES: "/employee/preferences"
+    PREFERENCES: "/employee/preferences",
+    APPLY_LEAVE: "/employee/apply-leave"
 };

@@ -14,6 +14,7 @@ export function usePreferencesData() {
         try {
             const response = await userService.getPreferences();
             if (response.code === APIResponse.SUCCESS) {
+                console.log("Preferences fetched successfully: ", response.data?.data);
                 appState.patch({ preferences: response.data?.data });
             }
         } catch (error) {

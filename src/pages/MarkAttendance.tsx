@@ -10,8 +10,11 @@ import APIResponse from "@/classes/APIResponse";
 const MarkAttendance: React.FC = () => {
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
     const [capturedFile, setCapturedFile] = useState<File | null>(null);
-    const [isMarked, setIsMarked] = useState(false);
+    const [isMarkedInTime, setIsMarkedInTime] = useState(false);
+    const [isMarkedOutTime, setIsMarkedOutTime] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [loadingMarkedStatus, setLoadingMarkedStatus] = useState(false);
+
     const { user, loading: loadingUser } = useUserData();
     const { loading: loadingPreferences } = usePreferencesData();
 
@@ -37,7 +40,7 @@ const MarkAttendance: React.FC = () => {
         };
     }, [capturedImage]);
 
-    const handleMarkAttendance = async () => {
+    const handleMarkIn = async () => {
         if (!capturedFile) {
             alert("Please take a picture first!");
             return;
@@ -51,9 +54,9 @@ const MarkAttendance: React.FC = () => {
             setLoading(true);
             const response = await attendance.mark(formData);
             if (response.code === APIResponse.SUCCESS) {
-                setIsMarked(true);
+                setIsMarkedInTime(true);
             } else {
-                alert("Failed to mark attendance!");
+                alert("Failed to mark In time!");
             }
         } catch (err) {
             console.error("Error marking attendance:", err);
@@ -61,6 +64,50 @@ const MarkAttendance: React.FC = () => {
             setLoading(false);
         }
     };
+
+    const handleMarkOut = async () => {
+        const formData = new FormData();
+        formData.append("outTime", new Date().toISOString());
+
+        try {
+            setLoading(true);
+            const response = await attendance.mark(formData);
+            if (response.code === APIResponse.SUCCESS) {
+                setIsMarkedOutTime(true);
+            } else {
+                alert("Failed to mark out time!");
+            }
+        } catch (err) {
+            console.error("Error marking attendance:", err);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const hasAlreadyMarkedInTime = () => {
+        const today = new Date().toISOString().split("T")[0];
+        console.log("today: ", today);
+        return user?.attended.some((attendance: any) => {
+            const attendanceDate = attendance.inTime?.split("T")[0];
+            return attendanceDate === today;
+        });
+    }
+
+    const hasAlreadyMarkedOutTime = () => {
+        const today = new Date().toISOString().split("T")[0];
+        console.log("today: ", today);
+        return user?.attended.some((attendance: any) => {
+            const attendanceDate = attendance.outTime?.split("T")[0];
+            return attendanceDate === today;
+        });
+    }
+
+    useEffect(() => {
+        setLoadingMarkedStatus(true);
+        setIsMarkedInTime(hasAlreadyMarkedInTime());
+        setIsMarkedOutTime(hasAlreadyMarkedOutTime());
+        setLoadingMarkedStatus(false);
+    }, [user]);
 
     if (loadingUser) {
         return <Spinner />;
@@ -70,18 +117,23 @@ const MarkAttendance: React.FC = () => {
         return <Spinner />;
     }
 
+    if (loadingMarkedStatus) {
+        return <Spinner />;
+    }
+
     return (
         <div className="min-h-full flex items-center justify-center">
             <div className="w-full max-w-md p-6 space-y-6">
                 <CameraPreview
                     capturedImage={capturedImage}
                     onCapture={handleCapture}
-                    isMarked={isMarked}
+                    isMarkedInTime={isMarkedInTime}
+                    isMarkedOutTime={isMarkedOutTime}
                 />
 
                 <UserProfileCard name={user?.name} employeeId={user?.empId} />
 
-                {!isMarked && (
+                {!isMarkedInTime && (
                     <>
                         {capturedImage ? (
                             <div className="flex gap-4">
@@ -93,10 +145,10 @@ const MarkAttendance: React.FC = () => {
                                 </button>
                                 <button
                                     disabled={loading}
-                                    onClick={handleMarkAttendance}
+                                    onClick={handleMarkIn}
                                     className="w-full bg-primary text-white font-semibold py-3 rounded-lg transition hover:bg-primary/90"
                                 >
-                                    {loading ? "MARKING..." : "MARK"}
+                                    {loading ? "MARKING..." : "MARK IN"}
                                 </button>
                             </div>
                         ) : (
@@ -107,9 +159,20 @@ const MarkAttendance: React.FC = () => {
                     </>
                 )}
 
-                {isMarked && (
+                {(isMarkedInTime) && (
                     <div className="text-center text-green-600 font-semibold">
-                        ✅ Attendance already marked
+                        {!isMarkedOutTime ? (
+                            <button
+                                onClick={handleMarkOut}
+                                className="w-full bg-primary text-white font-semibold py-3 rounded-lg transition hover:bg-primary/90"
+                            >
+                                {loading ? "MARKING..." : "MARK OUT"}
+                            </button>
+                        ): (
+                            <p className="text-center text-green-600 font-semibold">
+                                ✅ Already marked Out Time
+                            </p>
+                        )}
                     </div>
                 )}
             </div>

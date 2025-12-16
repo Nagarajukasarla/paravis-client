@@ -29,8 +29,10 @@ export interface BasicPageProps {
     description?: string;
 }
 
+export type DaySpecificationType = "holiday" | "weekend" | "attended" | "halfday" | "leave" | "unattended" | "overtime" | "extra";
+
 export interface DaySpecification {
-    type: "holiday" | "weekend" | "attended" | "leave" | "unattended";
+    type: DaySpecificationType;
     date: string;
     inTime?: string;
     outTime?: string;

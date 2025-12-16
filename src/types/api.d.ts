@@ -18,7 +18,7 @@ export interface Shift {
 export interface User extends PartialUser {
     imageUrl: string;
     shiftTimings: Shift;
-    attended: string[]; // Dates
+    attended: AttendedDay[]; // Dates
     leaves: string[]; // Dates
     totalDays: number;
 }
@@ -31,6 +31,18 @@ export interface MarkAttendanceRequest extends PartialUser {
 }
 
 export interface Preferences {
-    holidays: string[];
+    holidays: Record<string, string>[];
     weekends: string[];
+}
+
+export type LeaveType = "SICK" | "CASUAL" | "EMERGENCY"
+
+export interface Leave {
+    type: LeaveType;
+    date: string;
+}
+
+export interface AttendedDay {
+    inTime: string;
+    outTime: string;
 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import CInput from "@/components/core/CInput";
 import CButton from "@/components/core/CButton";
 import Input from "@/components/ui/Input";
@@ -7,6 +7,7 @@ import APIResponse from "@/classes/APIResponse";
 import { Navigate, useNavigate } from "react-router-dom";
 import useAuth from "@/hooks/useAuth";
 import Spinner from "@/components/feature/Spinner";
+import { SToast } from "@/components/core/SToast";
 
 const Login: React.FC = () => {
     const { isAuthorized, loading } = useAuth();
@@ -14,6 +15,14 @@ const Login: React.FC = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const emailInputRef = useRef<HTMLInputElement>(null);
+
+    // Focus the email input when component mounts
+    useEffect(() => {
+        if (emailInputRef.current) {
+            emailInputRef.current.focus();
+        }
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -24,6 +33,18 @@ const Login: React.FC = () => {
             console.log(response);
             if (response.code === APIResponse.SUCCESS) {
                 navigate("/");
+            }
+            if (response.code === APIResponse.BAD_REQUEST) {
+                const details =  response.data?.errorDetails;
+                if (details?.code === "PASSWORD_MISMATCH") {
+                    SToast.show({ title: "Wrong password", type: "error" });
+                }
+            }
+            if (response.code === APIResponse.NOT_FOUND) {
+                const details =  response.data?.errorDetails;
+                if (details?.code === "USER_NOT_FOUND") {
+                    SToast.show({ title: "User not found", type: "error" });
+                }
             }
         } catch (error) {
             console.error("Login error:", error);
@@ -41,8 +62,8 @@ const Login: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
-            <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
+        <div className="min-h-screen flex items-center justify-center  px-4 py-8">
+            <div className="w-full max-w-md bg-white rounded-lg  p-8">
                 {/* Logo */}
                 <div className="flex justify-center mb-6">
                     <img src="/images/Parvis.png" alt="Logo" className="w-24 h-24 rounded-lg object-cover" />
@@ -56,10 +77,13 @@ const Login: React.FC = () => {
                             Email or Username
                         </label>
                         <CInput
+                            ref={emailInputRef}
                             value={email}
                             placeholder="Enter your email or username"
                             onChange={e => setEmail(e.target.value)}
                             styles="w-full"
+                            required
+                            autoFocus
                         />
                     </div>
 
@@ -74,32 +98,23 @@ const Login: React.FC = () => {
                             placeholder="Enter your password"
                             onChange={e => setPassword(e.target.value)}
                             className="w-full"
+                            required
                         />
                     </div>
 
                     {/* Submit Button */}
                     <CButton
                         type="submit"
-                        className="w-full py-3 text-center font-semibold flex items-center justify-center gap-2"
+                        className="w-full font-semibold py-2"
                         disabled={isSubmitting}
                     >
                         {isSubmitting ? (
-                            <>
-                                <div
-                                    className="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4"
-                                    style={{
-                                        width: "16px",
-                                        height: "16px",
-                                        border: "2px solid #ffffff",
-                                        borderTop: "2px solid transparent",
-                                        borderRadius: "50%",
-                                        animation: "spin 1s linear infinite"
-                                    }}
-                                />
-                                <p className="text-white">Logging in...</p>
-                            </>
+                            <div className="flex items-center justify-center gap-2">
+                                <div className="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4" />
+                                <span>Logging in...</span>
+                            </div>
                         ) : (
-                            <p className="text-white">Login</p>
+                            "Login"
                         )}
                     </CButton>
                 </form>

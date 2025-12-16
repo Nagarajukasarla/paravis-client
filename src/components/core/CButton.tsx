@@ -15,7 +15,7 @@ const CButton: React.FC<CButtonProps> = ({ children, className, onClick, ...prop
                 "bg-primary text-white border border-primary",
                 "rounded-lg",
                 "h-[max-content] w-[max-content]",
-                "py-2 px-2",
+                "py-1 px-2",
                 "hover:bg-primary-hover hover:border-primary-hover",
                 "active:bg-primary-active active:border-primary-active",
                 "text-text-t2",
@@ -25,7 +25,7 @@ const CButton: React.FC<CButtonProps> = ({ children, className, onClick, ...prop
             onClick={onClick}
             {...props}
         >
-            {children || "Button"}
+            <div className="text-white">{children || "Button"}</div>
         </button>
     );
 };
